@@ -54,11 +54,18 @@ npm run build --prefix frontend
 firebase deploy --only functions,hosting --project rapbattle-e6ae7
 ```
 
-## GitHub Actions (optional)
-
-Repo secrets / variables:
-
-- `FIREBASE_SERVICE_ACCOUNT` — JSON service account with Firebase Hosting + Functions admin
-- `FIREBASE_PROJECT_ID` = `rapbattle-e6ae7`
+## GitHub Actions
 
 Workflow: `.github/workflows/deploy.yml`
+
+- **build** runs on every push to `main` (no secrets required).
+- **deploy** runs only when repo variable `ENABLE_FIREBASE_DEPLOY=true`.
+
+### Enable auto-deploy
+
+1. Firebase Console → Project settings → [Service accounts](https://console.firebase.google.com/project/rapbattle-e6ae7/settings/serviceaccounts/adminsdk) → **Generate new private key**
+2. Grant that service account roles: Cloud Functions Admin, Firebase Hosting Admin, Service Account User, Artifact Registry Writer (or use Editor for a pilot)
+3. GitHub repo → Settings → Secrets and variables → Actions:
+   - Secret `FIREBASE_SERVICE_ACCOUNT` = full JSON key contents
+   - Variable `ENABLE_FIREBASE_DEPLOY` = `true`
+4. Push to `main` (or re-run the workflow)
