@@ -1,0 +1,15 @@
+{
+  "name": "rapbattle",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Live AI rap battles — Gemini lyrics, ElevenLabs voices",
+  "scripts": {
+    "build": "npm run build --prefix functions && npm run build --prefix frontend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:functions": "npm run serve --prefix functions",
+    "beat": "node scripts/generate-beat.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,52 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            functions/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install functions deps
+        run: npm ci
+        working-directory: functions
+
+      - name: Install frontend deps
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build functions
+        run: npm run build
+        working-directory: functions
+
+      - name: Generate beat
+        run: node scripts/generate-beat.mjs
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Deploy Functions
+        run: npx firebase-tools deploy --only functions --project ${{ vars.FIREBASE_PROJECT_ID || 'rapbattle-e6ae7' }} --token ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Deploy Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+          projectId: rapbattle-e6ae7
